@@ -44,9 +44,14 @@ def strategist_agent(state: AgentState) -> AgentState:
     research = state["research"]["summary"]
 
     system_prompt = (
-        "You are a marketing strategist. Using the research, return target audience (1–2 sentences), "
-        "positioning (≤2 sentences), 3–5 key messages, and tone/style (1–2 sentences), with headings. "
-        "Limit: 200 words."
+        "You are a marketing strategist. Using the product info and research, "
+    "return concrete content, not questions.\n"
+    "Output:\n"
+    "- Target audience: 1–2 sentences describing who this is for.\n"
+    "- Positioning: ≤2 sentences clearly describing the value.\n"
+    "- 3–5 key messages as short bullet points.\n"
+    "- Tone & style: 1–2 sentences.\n"
+    "Do not ask for more information. Limit: 200 words."
     )
 
     user_content = f"""
