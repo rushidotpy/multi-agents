@@ -1,7 +1,7 @@
 from typing import Dict, List, Any
 from tools import web_search
 from llm_client import call_llm
-
+import time
 
 # ---------- Types ----------
 
@@ -196,13 +196,16 @@ Draft brief:
 def run_single_pass(state: AgentState) -> AgentState:
     # 1) Research + strategy once
     state = researcher_agent(state)
+    time.sleep(1)
     state = strategist_agent(state)
-
+    time.sleep(1)
     # 2) Writer + Reviewer loop
     max_rounds = 3
     for round_idx in range(max_rounds):
         state = writer_agent(state)
+        time.sleep(1)
         state = reviewer_agent(state)
+        time.sleep(1)
 
         if state["review"].get("approved"):
             # Approved – stop looping
