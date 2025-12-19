@@ -1,6 +1,8 @@
+from typing import Any, Dict
 from agents import run_single_pass
-def run_workflow_for_product(product: dict) -> dict:
-    state = {
+
+def run_workflow_for_product(product: Dict[str, Any]) -> Dict[str, Any]:
+    state: Dict[str, Any] = {
         "product": product,
         "research": {},
         "strategy": {},

@@ -97,15 +97,22 @@ Research snippets:
     return state
 
 # ---------- Writer ----------
-
 def writer_agent(state: AgentState) -> AgentState:
     product = state["product"]["product"]
     strategy = state["strategy"]
+    previous_review = state.get("review")  # may be None
+
+    review_notes = ""
+    if previous_review and not previous_review.get("approved", True):
+        issues = previous_review.get("issues", [])
+        if issues:
+            review_notes = "\n\nReviewer feedback to address:\n- " + "\n- ".join(issues)
 
     system_prompt = (
         "You are a marketing copywriter. "
         "Expand the outline into a full marketing brief. "
         "Respect tone, channels, and word count constraints when provided. "
+        "If reviewer feedback is provided, revise the draft to address it explicitly. "
         "Return plain markdown text only, no JSON."
     )
 
@@ -122,6 +129,7 @@ Outline:
 
 Key messages:
 {chr(10).join('- ' + m for m in strategy['key_messages'])}
+{review_notes}
 """
 
     draft_text = call_llm(system_prompt, user_content)
@@ -130,9 +138,8 @@ Key messages:
         "text": draft_text,
         "key_messages": strategy["key_messages"],
     }
-    
-    return state
 
+    return state
 
 # ---------- Reviewer ----------
 
@@ -186,19 +193,17 @@ Draft brief:
 
 # ---------- Orchestrator helper ----------
 
-def run_single_pass(product: Dict[str, Any]) -> AgentState:
-    """
-    Simple one-shot pipeline:
-    product -> Researcher -> Strategist -> Writer -> Reviewer
-    This is *not* the full LangGraph/CrewAI orchestration,
-    just a convenient function for testing agents in sequence.
-    """
-    state: AgentState = {"product": product}
-
+def run_single_pass(state: AgentState) -> AgentState:
+    # Initial pass: Research + Strategy
     state = researcher_agent(state)
     state = strategist_agent(state)
-    state = writer_agent(state)
-    state = reviewer_agent(state)
 
-    
+    # Loop Writer ↔ Reviewer
+    max_loops = 2  # or 3 if you want more refinement
+    for _ in range(max_loops):
+        state = writer_agent(state)
+        state = reviewer_agent(state)
+        if state["review"].get("approved"):
+            break
+
     return state
