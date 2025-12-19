@@ -1,0 +1,41 @@
+[
+  {
+    "product_id": "ai_coding_tutor",
+    "product_name": "CodeLift AI Tutor",
+    "short_description": "An AI coding tutor that helps university students debug code and understand concepts.",
+    "target_audience": "Undergraduate CS students",
+    "goals": ["drive free signups", "convert 10% to paid within 30 days"],
+    "constraints": {
+      "tone": "supportive, non-judgmental, beginner-friendly",
+      "channels": ["landing_page", "email", "social"],
+      "regions": ["US", "UK"],
+      "word_count_limit": 1200
+    }
+  },
+  {
+    "product_id": "fitness_app",
+    "product_name": "PulseTrack",
+    "short_description": "A mobile app that builds personalized workout plans for busy professionals.",
+    "target_audience": "Working professionals aged 25–40",
+    "goals": ["increase app installs", "improve 7-day retention"],
+    "constraints": {
+      "tone": "motivational, science-backed, no gimmicks",
+      "channels": ["landing_page", "paid_ads"],
+      "regions": ["US", "Canada"],
+      "word_count_limit": 1000
+    }
+  },
+  {
+    "product_id": "notes_app",
+    "product_name": "NoteFlow",
+    "short_description": "A note-taking app that turns scattered notes into organized study guides.",
+    "target_audience": "High school and college students",
+    "goals": ["drive signups before exam season"],
+    "constraints": {
+      "tone": "friendly, energetic, student-first",
+      "channels": ["email", "social"],
+      "regions": ["Global"],
+      "word_count_limit": 800
+    }
+  }
+]

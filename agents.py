@@ -8,32 +8,39 @@ from llm_client import call_llm
 AgentState = Dict[str, Any]  # shared state dict passed between agents
 
 # ---------- Researcher ----------
-
-def researcher_agent(state: AgentState) -> AgentState:
-    """
-    Uses web_search() + product info to build structured research notes.
-    Expects state to contain: product (dict with name, target_audience, etc.)
-    """
-    product = state["product"]  # from products.json
+def researcher_agent(state):
+    product = state["product"]["product"]
     product_name = product["product_name"]
-    audience = product["target_audience"]
-
-    queries = [
-        f"{product_name} competitors",
-        f"{audience} pain points for {product_name}",
-        f"{product_name} reviews 2025",
-        f"{audience} using {product_name} benefits",
-    ]
-
-    research_snippets: List[Dict[str, str]] = []
-    for q in queries:
-        results = web_search(q)
-        research_snippets.extend(results)
-
-    # Keep it in a structured way
+    short_description = product["short_description"]
+    target_audience = product["target_audience"]
+    goals = product["goals"]
+    constraints = product["constraints"]
+    
+    system_prompt = (
+        "You are a market researcher. Find 5-8 relevant web snippets about "
+        f"{product_name} and its {target_audience} audience. "
+        "Respond as JSON list of snippets with 'title' and 'snippet' keys."
+    )
+    
+    user_content = f"""
+Research this product for marketing:
+- Name: {product_name}
+- Description: {short_description}
+- Audience: {target_audience}
+- Goals: {', '.join(goals)}
+"""
+    
+    raw_snippets = call_llm(system_prompt, user_content)
+    
+    import json
+    try:
+        snippets = json.loads(raw_snippets)
+    except:
+        snippets = []
+    
     state["research"] = {
-        "queries": queries,
-        "snippets": research_snippets,
+        "snippets": snippets[:8],
+        "timestamp": "now"
     }
     return state
 
@@ -41,7 +48,7 @@ def researcher_agent(state: AgentState) -> AgentState:
 # ---------- Strategist ----------
 
 def strategist_agent(state: AgentState) -> AgentState:
-    product = state["product"]
+    product = state["product"]["product"]
     research = state["research"]
 
     system_prompt = (
@@ -86,12 +93,13 @@ Research snippets:
         "key_messages": key_messages,
         "research_used": research["snippets"][:5],
     }
+    
     return state
 
 # ---------- Writer ----------
 
 def writer_agent(state: AgentState) -> AgentState:
-    product = state["product"]
+    product = state["product"]["product"]
     strategy = state["strategy"]
 
     system_prompt = (
@@ -122,6 +130,7 @@ Key messages:
         "text": draft_text,
         "key_messages": strategy["key_messages"],
     }
+    
     return state
 
 
@@ -129,7 +138,7 @@ Key messages:
 
 def reviewer_agent(state: AgentState) -> AgentState:
     draft = state["draft"]
-    product = state["product"]
+    product = state["product"]["product"]
 
     system_prompt = (
         "You are a strict marketing reviewer. "
@@ -171,6 +180,7 @@ Draft brief:
         "issues": issues,
         "comments": comments,
     }
+    
     return state
 
 
@@ -190,4 +200,5 @@ def run_single_pass(product: Dict[str, Any]) -> AgentState:
     state = writer_agent(state)
     state = reviewer_agent(state)
 
+    
     return state
