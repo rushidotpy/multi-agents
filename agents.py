@@ -48,7 +48,7 @@ Research this product for marketing:
 # ---------- Strategist ----------
 
 def strategist_agent(state: AgentState) -> AgentState:
-    product = state["product"]["product"]
+    product = state["product"]
     research = state["research"]
 
     system_prompt = (
@@ -98,7 +98,7 @@ Research snippets:
 
 # ---------- Writer ----------
 def writer_agent(state: AgentState) -> AgentState:
-    product = state["product"]["product"]
+    product = state["product"]
     strategy = state["strategy"]
     previous_review = state.get("review")  # may be None
 
@@ -145,7 +145,7 @@ Key messages:
 
 def reviewer_agent(state: AgentState) -> AgentState:
     draft = state["draft"]
-    product = state["product"]["product"]
+    product = state["product"]
 
     system_prompt = (
         "You are a strict marketing reviewer. "
