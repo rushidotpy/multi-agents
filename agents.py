@@ -9,7 +9,7 @@ AgentState = Dict[str, Any]  # shared state dict passed between agents
 
 # ---------- Researcher ----------
 def researcher_agent(state):
-    product = state["product"]["product"]
+    product = state["product"]
     product_name = product["product_name"]
     short_description = product["short_description"]
     target_audience = product["target_audience"]
