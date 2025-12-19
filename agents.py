@@ -17,10 +17,12 @@ def researcher_agent(state):
     constraints = product["constraints"]
     
     system_prompt = (
-        "You are a market researcher. Find 5-8 relevant web snippets about "
-        f"{product_name} and its {target_audience} audience. "
-        "Respond as JSON list of snippets with 'title' and 'snippet' keys."
-    )
+    "You are a market researcher. From the product info, return 3–5 customer pains, "
+    "3–5 benefits, and up to 3 competitor insights in sections titled 'Customer pains', "
+    "'Benefits', and 'Competitors'. Limit: 120 words total."
+)
+
+
     
     user_content = f"""
 Research this product for marketing:
@@ -50,14 +52,13 @@ Research this product for marketing:
 def strategist_agent(state: AgentState) -> AgentState:
     product = state["product"]
     research = state["research"]
-
     system_prompt = (
-        "You are a senior marketing strategist. "
-        "Given a product and research snippets, design a structured marketing brief outline "
-        "and 3–6 key messages. Respond in strict JSON with keys: "
-        "outline (list of strings), key_messages (list of strings). "
-        "Do not include any text outside the JSON."
-    )
+    "You are a marketing strategist. Using the research, return target audience (1–2 sentences), "
+    "positioning (≤2 sentences), 3–5 key messages, and tone/style (1–2 sentences), with headings. "
+    "Limit: 200 words."
+)
+
+
 
     snippets_text = "\n\n".join(
         f"- {s['title']}: {s['snippet']}" for s in research["snippets"][:8]
@@ -109,12 +110,11 @@ def writer_agent(state: AgentState) -> AgentState:
             review_notes = "\n\nReviewer feedback to address:\n- " + "\n- ".join(issues)
 
     system_prompt = (
-        "You are a marketing copywriter. "
-        "Expand the outline into a full marketing brief. "
-        "Respect tone, channels, and word count constraints when provided. "
-        "If reviewer feedback is provided, revise the draft to address it explicitly. "
-        "Return plain markdown text only, no JSON."
-    )
+    "You are a marketing copywriter. Write a blog post with title, intro, 3–5 headed sections, "
+    "and conclusion based on the product and strategy. Style: clear, persuasive, skimmable. "
+    "Limit: 800–1,000 words."
+)
+
 
     user_content = f"""
 Product:
@@ -148,13 +148,12 @@ def reviewer_agent(state: AgentState) -> AgentState:
     product = state["product"]
 
     system_prompt = (
-        "You are a strict marketing reviewer. "
-        "Given a product and a draft brief, decide if it is READY or NEEDS_CHANGES. "
-        "Check: product fit, clarity, presence of key value prop, audience fit, and tone. "
-        "Respond in strict JSON with keys: "
-        "approved (true/false), issues (list of strings), comments (string). "
-        "Do not include any text outside the JSON."
-    )
+    "You are an editor. Review the draft for clarity, structure, tone, and fit with the product spec; "
+    "return a bullet list of issues and specific fixes or short rewrites only. "
+    "Do not rewrite the whole article. Limit: 200 words."
+)
+
+
 
     user_content = f"""
 Product:
@@ -195,21 +194,26 @@ Draft brief:
 
 def run_single_pass(state: AgentState) -> AgentState:
     # 1) Research + strategy once
+    print("Starting researcher")
     state = researcher_agent(state)
     time.sleep(1)
+    print("Starting strategist")
     state = strategist_agent(state)
     time.sleep(1)
     # 2) Writer + Reviewer loop
     max_rounds = 3
     for round_idx in range(max_rounds):
+        print("Starting writer")
         state = writer_agent(state)
         time.sleep(1)
+        print("Starting reviewer")
         state = reviewer_agent(state)
         time.sleep(1)
 
         if state["review"].get("approved"):
             # Approved – stop looping
             state["review"]["rounds"] = round_idx + 1
+            print("Finished single pass")
             return state
 
         # Not approved – add a note for the next round
