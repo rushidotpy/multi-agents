@@ -1,8 +1,12 @@
 import json
+import os
 from typing import Dict, Any
 
-def load_products(path: str = "data/knowledge/products.json") -> Dict[str, Any]:
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PRODUCTS_PATH = os.path.join(BASE_DIR, "data", "products.json")
+
+def load_products(path: str = PRODUCTS_PATH) -> Dict[str, Any]:
+    print("Loading products from:", path)  # will appear in Streamlit logs
     with open(path, "r") as f:
         products = json.load(f)
-    # index by product_id for easy access
     return {p["product_id"]: p for p in products}
