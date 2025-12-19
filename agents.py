@@ -194,16 +194,25 @@ Draft brief:
 # ---------- Orchestrator helper ----------
 
 def run_single_pass(state: AgentState) -> AgentState:
-    # Initial pass: Research + Strategy
+    # 1) Research + strategy once
     state = researcher_agent(state)
     state = strategist_agent(state)
 
-    # Loop Writer ↔ Reviewer
-    max_loops = 2  # or 3 if you want more refinement
-    for _ in range(max_loops):
+    # 2) Writer + Reviewer loop
+    max_rounds = 3
+    for round_idx in range(max_rounds):
         state = writer_agent(state)
         state = reviewer_agent(state)
-        if state["review"].get("approved"):
-            break
 
+        if state["review"].get("approved"):
+            # Approved – stop looping
+            state["review"]["rounds"] = round_idx + 1
+            return state
+
+        # Not approved – add a note for the next round
+        # (the writer_agent already reads product + strategy; you can also
+        #  modify it later to incorporate review['issues'] if you want)
+        state["review"]["rounds"] = round_idx + 1
+
+    # 3) If still not approved after max_rounds, return best effort
     return state
