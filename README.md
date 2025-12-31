@@ -1,9 +1,10 @@
-link: https://multi-agents-workflow-automator.streamlit.app/
+**Watch the multi-agent system generate a structured marketing brief**: https://drive.google.com/file/d/12QV3Ddbs16qiGAD-_3o0qyyFX9X08jIq/view?usp=sharing
 
 # Multi-Agent Marketing Brief Automator
 
 A **4-agent LLM workflow** to turn short product descriptions into structured, high-quality marketing briefs in **one click**. Built with **Python + Streamlit** and leveraging **Groq's openai/gpt-oss-120B** model.
 
+**link**: https://multi-agents-workflow-automator.streamlit.app/
 ---
 
 ## 🚀 Features
@@ -24,11 +25,11 @@ A **4-agent LLM workflow** to turn short product descriptions into structured, h
 ## ⚙️ How It Works
 
 1. **Input:** A short product description.
-2. **Pre-agent LLM:** Infers target audience and metadata.
+2. **Pre-agent LLM:** Enriches the product specification to support efficient search and retrieval within the workflow.
 3. **Agent workflow:**  
    - Researcher → Strategist → Writer → Reviewer  
    - Optional reviewer loop for iterative refinement
-4. **Output:** Structured, multi-section marketing brief.
+4. **Output:** Structured, multi-section marketing brief ready for review and search indexing
 
 **Prompt context per agent:**
 | Agent      | Context Provided              |
@@ -44,14 +45,15 @@ A **4-agent LLM workflow** to turn short product descriptions into structured, h
 
 - **Language:** Python 3.11+  
 - **UI:** Streamlit  
-- **LLM:** `openai/gpt-oss-120B` via **Groq SDK**  
+- **LLM**: `openai/gpt-oss-120B` via **Groq**
+- **Search/Enrichment**: **Tavily** for product spec preprocessing and retrieval
 - **Data:** JSON product specs, shared state directory  
-- **Secrets:** `.env` file or Streamlit secrets (ignored in Git)  
+- **Secrets:** Streamlit secrets  
 
 ---
 
 ## 📁 Project Structure
-
+```text
 project-root/
 │
 ├── app.py # Entry point, loads products and runs workflow
@@ -65,24 +67,11 @@ project-root/
 ├── state/ # Shared workflow state (research, strategy, draft, review)
 ├── requirements.txt
 └── README.md
+```
+---
+📌 ##Key Learnings
+- Designing token-efficient multi-agent workflows
+- Handling rate limits and retries for large-scale LLM calls
+- Structuring AI automation for real-world usability
+- Iterative feedback loops to maintain high-quality outputs
 
-
-Watch the multi-agent system generate a structured marketing brief: https://drive.google.com/file/d/12QV3Ddbs16qiGAD-_3o0qyyFX9X08jIq/view?usp=sharing
-
-🔧 Next Steps / Future Work
-Integrate real-world data retrieval for richer research
-
-Support additional content formats (emails, ads, social posts)
-
-Add analytics dashboards for output insights
-
-Experiment with custom agent tools and plugins
-
-📌 Key Learnings
-Designing token-efficient multi-agent workflows
-
-Handling rate limits and retries for large-scale LLM calls
-
-Structuring AI automation for real-world usability
-
-Iterative feedback loops to maintain high-quality outputs
