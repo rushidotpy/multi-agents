@@ -29,7 +29,7 @@ A **4-agent LLM workflow** to turn short product descriptions into structured, h
 3. **Agent workflow:**  
    - Researcher → Strategist → Writer → Reviewer  
    - Optional reviewer loop for iterative refinement
-4. **Output:** Structured, multi-section marketing brief ready for review and search indexing
+4. **Output:** Structured, multi-section marketing brief ready for review and search indexing.
 
 **Prompt context per agent:**
 | Agent      | Context Provided              |
